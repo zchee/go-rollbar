@@ -1,0 +1,14 @@
+// Copyright 2017 The go-rollbar Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package rollbar_v1
+
+const (
+	DefaultEndpoint = "https://api.rollbar.com/api/1/item/"
+)
+
+type Field struct {
+	Name string      `json:"name,omitempty"`
+	Data interface{} `json:"data,omitempty"`
+}

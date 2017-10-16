@@ -1,0 +1,130 @@
+{
+  "access_token": "aaaabbbbccccddddeeeeffff00001111",
+  "data": {
+    "environment": "production",
+    "body": {
+      "telemetry": {
+        "level": "info",
+        "type": "network",
+        "source": "client",
+        "timestamp_ms": 1500413393557,
+        "body": {
+          "subtype": "xhr",
+          "method": "GET",
+          "url": "/api/1/item/4/",
+          "status_code": "200",
+          "start_timestamp_ms": 1500413394557,
+          "end_timestamp_ms": 1500413394957
+        }
+      },
+      "trace": {
+        "frames": [
+          {
+            "filename": "/Users/brian/www/mox/mox/views/project.py",
+            "lineno": 26,
+            "colno": 8,
+            "method": "index",
+            "code": "_save_last_project(request, project_id, force=True)",
+            "class_name": "java.lang.String",
+            "context": {
+              "pre": [
+                "project = request.context",
+                "project_id = project.id"
+              ],
+              "post": []
+            },
+            "args": ["<Request object>", 25],
+            "kwargs": {
+              "force": true
+            },
+            "argspec": ["request", "user"],
+            "varargspec": "args",
+            "keywordspec": "kwargs",
+            "locals": {
+                "request": "<Request object>",
+                "user": "<User object>",
+                "args": [true, "Python"],
+                "kwargs": {"level": "warning"}
+            }
+          },
+          {
+            "filename": "/Users/brian/www/mox/mox/views/project.py",
+            "lineno": 497,
+            "method": "_save_last_project",
+            "code": "user = foo"
+          }
+        ],
+        "exception": {
+          "class": "NameError",
+          "message": "global name 'foo' is not defined",
+          "description": "Something went wrong while trying to save the user object"
+        }
+
+      },
+      "trace_chain": [
+      ],
+      "message": {
+        "body": "Request over threshold of 10 seconds",
+        "route": "home#index",
+        "time_elapsed": 15.23
+
+      },
+      "crash_report": {
+        "raw": "<crash report here>"
+      }
+    },
+    "level": "error",
+    "timestamp": 1369188822,
+    "code_version": "3da541559918a808c2402bba5012f6c60b27661c",
+    "platform": "linux",
+    "language": "python",
+    "framework": "pyramid",
+    "context": "project#index",
+    "request": {
+      "url": "https://rollbar.com/project/1",
+      "method": "GET",
+      "headers": {
+        "Accept": "text/html",
+        "Referer": "https://rollbar.com/"
+      },
+      "params": {
+        "controller": "project",
+        "action": "index"
+      },
+      "GET": {},
+      "query_string": "",
+      "POST": {},
+      "body": "",
+      "user_ip": "100.51.43.14"
+    },
+    "person": {
+      "id": "12345",
+      "username": "brianr",
+      "email": "brian@rollbar.com"
+    },
+    "server": {
+      "host": "web4",
+      "root": "/Users/brian/www/mox",
+      "branch": "master",
+      "code_version": "b6437f45b7bbbb15f5eddc2eace4c71a8625da8c",
+      "sha": "b6437f45b7bbbb15f5eddc2eace4c71a8625da8c"
+    },
+    "client": {
+      "javascript": {
+        "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3)",
+        "code_version": "b6437f45b7bbbb15f5eddc2eace4c71a8625da8c",
+        "source_map_enabled": false,
+        "guess_uncaught_frames": false
+
+      }
+    },
+    "custom": {},
+    "fingerprint": "50a5ef9dbcf9d0e0af2d4e25338da0d430f20e52",
+    "title": "NameError when setting last project in views/project.py",
+    "uuid": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+    "notifier": {
+      "name": "pyrollbar",
+      "version": "0.5.5"
+    }
+  }
+}
