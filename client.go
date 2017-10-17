@@ -39,8 +39,6 @@ type httpClient struct {
 	codeVersion string
 	serverHost  string
 	serverRoot  string
-	id          string
-	custom      map[string]interface{}
 }
 
 // New creates a new REST rollbar API client.
