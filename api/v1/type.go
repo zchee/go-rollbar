@@ -136,11 +136,11 @@ type Person struct {
 }
 
 type Server struct {
-	Branch      string `json:"branch"`
-	CodeVersion string `json:"code_version"`
-	Host        string `json:"host"`
-	Root        string `json:"root"`
-	Sha         string `json:"sha"`
+	Branch      string `json:"branch,omitempty"`
+	CodeVersion string `json:"code_version,omitempty"`
+	Host        string `json:"host,omitempty"`
+	Root        string `json:"root,omitempty"`
+	Sha         string `json:"sha,omitempty"`
 }
 
 type Client struct {
