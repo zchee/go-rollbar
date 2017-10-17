@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	api "github.com/zchee/go-rollbar/api/v1"
 	"golang.org/x/net/context"
@@ -22,6 +21,14 @@ import (
 )
 
 type Client struct {
+	debug        *DebugService
+	info         *InfoService
+	errorService *ErrorService
+	warn         *WarnService
+	critical     *CriticalService
+}
+
+type httpClient struct {
 	token       string
 	client      *http.Client
 	endpoint    string
@@ -32,6 +39,8 @@ type Client struct {
 	codeVersion string
 	serverHost  string
 	serverRoot  string
+	id          string
+	custom      map[string]interface{}
 }
 
 // New creates a new REST rollbar API client.
@@ -84,9 +93,9 @@ func New(token string, options ...Option) Rollbar {
 		serverHost, _ = os.Hostname()
 	}
 
-	return &Client{
-		client:      cl,
+	client := &httpClient{
 		token:       token,
+		client:      cl,
 		endpoint:    endpoint,
 		debug:       debug,
 		logger:      logger,
@@ -96,29 +105,21 @@ func New(token string, options ...Option) Rollbar {
 		serverHost:  serverHost,
 		serverRoot:  serverRoot,
 	}
+
+	return &Client{
+		debug:        &DebugService{client: client},
+		info:         &InfoService{client: client},
+		errorService: &ErrorService{client: client},
+		warn:         &WarnService{client: client},
+		critical:     &CriticalService{client: client},
+	}
 }
 
 // payload creates the rollbar payload data.
-func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Payload {
+func (c *httpClient) payload(level Level, err error) *api.Payload {
 	title := "<nil>"
 	if err != nil {
 		title = err.Error()
-	}
-
-	var (
-		customs map[string]interface{}
-		id      string
-	)
-	for _, o := range options {
-		switch o.Key() {
-		case keyCustom:
-			customs = o.Value().(map[string]interface{})
-		case keyUUID:
-			id = o.Value().(string)
-		}
-	}
-	if id == "" {
-		id = uuid.New().String()
 	}
 
 	data := &api.Data{
@@ -137,8 +138,6 @@ func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Pa
 			Name:    Name,
 			Version: Version,
 		},
-		Custom: customs,
-		UUID:   id,
 	}
 
 	return &api.Payload{
@@ -148,12 +147,11 @@ func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Pa
 }
 
 // post posts payload to rollbar.
-func (c *Client) post(pctx context.Context, level Level, err error, options ...ErrorOption) error {
+func (c *httpClient) post(pctx context.Context, payload *api.Payload) error {
 	if c.token == "" {
 		return errors.New("empty token")
 	}
 
-	payload := c.payload(level, err, options...)
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return errors.Wrap(err, "failed to encode payload")
@@ -186,7 +184,7 @@ func (c *Client) post(pctx context.Context, level Level, err error, options ...E
 }
 
 // parseResponse parses the rollbar API response.
-func (c *Client) parseResponse(ctx context.Context, rdr io.Reader, data interface{}) error {
+func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader, data interface{}) error {
 	if c.debug {
 		var buf bytes.Buffer
 		io.Copy(&buf, rdr)
@@ -204,39 +202,4 @@ func (c *Client) parseResponse(ctx context.Context, rdr io.Reader, data interfac
 		rdr = &buf
 	}
 	return json.NewDecoder(rdr).Decode(&data)
-}
-
-// Debug sends the error to rollbar with debug level.
-func (c *Client) Debug(ctx context.Context, err error, options ...ErrorOption) {
-	if err := c.post(ctx, DebugLevel, err, options...); err != nil {
-		c.logger.Debug(ctx, "rollbar: Debug: %+v", err)
-	}
-}
-
-// Info sends the error to rollbar with info level.
-func (c *Client) Info(ctx context.Context, err error, options ...ErrorOption) {
-	if err := c.post(ctx, InfoLevel, err, options...); err != nil {
-		c.logger.Debug(ctx, "rollbar: Info: %+v", err)
-	}
-}
-
-// Error sends the error to rollbar with error level.
-func (c *Client) Error(ctx context.Context, err error, options ...ErrorOption) {
-	if err := c.post(ctx, ErrorLevel, err, options...); err != nil {
-		c.logger.Debug(ctx, "rollbar: Error: %+v", err)
-	}
-}
-
-// Warn sends the error to rollbar with warn level.
-func (c *Client) Warn(ctx context.Context, err error, options ...ErrorOption) {
-	if err := c.post(ctx, WarnLevel, err, options...); err != nil {
-		c.logger.Debug(ctx, "rollbar: Warn: %+v", err)
-	}
-}
-
-// Critical sends the error to rollbar with critical level.
-func (c *Client) Critical(ctx context.Context, err error, options ...ErrorOption) {
-	if err := c.post(ctx, CriticalLevel, err, options...); err != nil {
-		c.logger.Debug(ctx, "rollbar: Critical: %+v", err)
-	}
 }

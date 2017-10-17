@@ -4,10 +4,6 @@
 
 package rollbar
 
-import (
-	"golang.org/x/net/context"
-)
-
 const (
 	Name    = "go-rollbar"
 	Version = "0.0.0"
@@ -16,9 +12,9 @@ const (
 )
 
 type Rollbar interface {
-	Debug(context.Context, error, ...ErrorOption)
-	Info(context.Context, error, ...ErrorOption)
-	Error(context.Context, error, ...ErrorOption)
-	Warn(context.Context, error, ...ErrorOption)
-	Critical(context.Context, error, ...ErrorOption)
+	Debug(error) Call
+	Info(error) Call
+	Error(error) Call
+	Warn(error) Call
+	Critical(error) Call
 }
