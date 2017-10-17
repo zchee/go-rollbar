@@ -9,7 +9,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/net/context"
 )
 
@@ -34,7 +33,7 @@ type traceLogger struct {
 
 // Debug outputs the debug log output.
 func (l traceLogger) Debug(_ context.Context, f string, args ...interface{}) {
-	fmt.Fprintf(l.w, spew.Sprintf(newLine(f), args...))
+	fmt.Fprintf(l.w, newLine(f), args...)
 }
 
 // Info outputs the info log output.
