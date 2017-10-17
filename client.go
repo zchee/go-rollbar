@@ -176,7 +176,7 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf("received response: %s", resp.Status)
 	}
 
