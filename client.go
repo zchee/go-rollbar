@@ -32,7 +32,6 @@ type Client struct {
 	codeVersion string
 	serverHost  string
 	serverRoot  string
-	custom      []string
 }
 
 // New creates a new REST rollbar API client.
@@ -106,9 +105,14 @@ func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Pa
 		title = err.Error()
 	}
 
-	var id string
+	var (
+		customs map[string]interface{}
+		id      string
+	)
 	for _, o := range options {
 		switch o.Key() {
+		case keyCustom:
+			customs = o.Value().(map[string]interface{})
 		case keyUUID:
 			id = o.Value().(string)
 		}
@@ -133,7 +137,8 @@ func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Pa
 			Name:    Name,
 			Version: Version,
 		},
-		UUID: id,
+		Custom: customs,
+		UUID:   id,
 	}
 
 	return &api.Payload{

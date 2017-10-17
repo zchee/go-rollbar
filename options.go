@@ -165,10 +165,10 @@ const (
 )
 
 // WithCustom is any arbitrary metadata you want to send. "custom" itself should be an object.
-func WithCustom(version string) ErrorOption {
+func WithCustom(customs map[string]interface{}) ErrorOption {
 	return &errorOption{
 		key:   keyCustom,
-		value: version,
+		value: customs,
 	}
 }
 
