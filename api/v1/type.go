@@ -13,24 +13,24 @@ type Payload struct {
 }
 
 type Data struct {
-	Environment string        `json:"environment"`
-	Body        *Body         `json:"body"`
-	Level       string        `json:"level,omitempty"`
-	Timestamp   int64         `json:"timestamp,omitempty"`
-	CodeVersion string        `json:"code_version,omitempty"`
-	Platform    string        `json:"platform,omitempty"`
-	Language    string        `json:"language,omitempty"`
-	Framework   string        `json:"framework,omitempty"`
-	Context     string        `json:"context,omitempty"`
-	Request     *Request      `json:"request,omitempty"`
-	Person      *Person       `json:"person,omitempty"`
-	Server      *Server       `json:"server,omitempty"`
-	Client      *Client       `json:"client,omitempty"`
-	Custom      []interface{} `json:"custom,omitempty"`
-	Fingerprint string        `json:"fingerprint,omitempty"`
-	Title       string        `json:"title,omitempty"`
-	UUID        string        `json:"uuid,omitempty"`
-	Notifier    *Notifier     `json:"notifier,omitempty"`
+	Environment string                 `json:"environment"`
+	Body        *Body                  `json:"body"`
+	Level       string                 `json:"level,omitempty"`
+	Timestamp   int64                  `json:"timestamp,omitempty"`
+	CodeVersion string                 `json:"code_version,omitempty"`
+	Platform    string                 `json:"platform,omitempty"`
+	Language    string                 `json:"language,omitempty"`
+	Framework   string                 `json:"framework,omitempty"`
+	Context     string                 `json:"context,omitempty"`
+	Request     *Request               `json:"request,omitempty"`
+	Person      *Person                `json:"person,omitempty"`
+	Server      *Server                `json:"server,omitempty"`
+	Client      *Client                `json:"client,omitempty"`
+	Custom      map[string]interface{} `json:"custom,omitempty"`
+	Fingerprint string                 `json:"fingerprint,omitempty"`
+	Title       string                 `json:"title,omitempty"`
+	UUID        string                 `json:"uuid,omitempty"`
+	Notifier    *Notifier              `json:"notifier,omitempty"`
 }
 
 type Body struct {

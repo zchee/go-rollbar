@@ -7,8 +7,3 @@ package rollbar_v1
 const (
 	DefaultEndpoint = "https://api.rollbar.com/api/1/item/"
 )
-
-type Field struct {
-	Name string      `json:"name,omitempty"`
-	Data interface{} `json:"data,omitempty"`
-}
