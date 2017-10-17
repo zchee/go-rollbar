@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	api "github.com/zchee/go-rollbar/api/v1"
 	"golang.org/x/net/context"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 type Client struct {
@@ -159,10 +160,8 @@ func (c *Client) post(pctx context.Context, level Level, err error) error {
 	ctx, cancel := context.WithCancel(pctx)
 	defer cancel()
 
-	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
+	resp, err := ctxhttp.Do(ctx, c.client, req)
 	if err != nil {
 		return errors.Wrap(err, "failed to POST to rollbar")
 	}
