@@ -122,7 +122,7 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 
 	data := &api.Data{
 		Title:       title,
-		Body:        errorBody(err, CreateStack(4)),
+		Body:        errorBody(err, CreateStack(3)),
 		Environment: c.environment,
 		Level:       string(level),
 		Timestamp:   time.Now().Unix(),
