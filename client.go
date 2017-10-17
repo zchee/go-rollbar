@@ -39,7 +39,7 @@ type Client struct {
 //
 // The `token` is required, other optional parameters can be passed using the
 // various `With...` functions.
-func New(token string, options ...Option) *Client {
+func New(token string, options ...Option) Rollbar {
 	cl := http.DefaultClient
 	endpoint := api.DefaultEndpoint
 	debug, _ := strconv.ParseBool(os.Getenv("ROLLBAR_DEBUG"))
