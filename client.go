@@ -53,7 +53,7 @@ func New(token string, options ...Option) *Client {
 	)
 
 	for _, o := range options {
-		switch o.Name() {
+		switch o.Key() {
 		case keyHTTPClient:
 			cl = o.Value().(*http.Client)
 		case keyEndpoint:

@@ -11,33 +11,35 @@ import (
 // Option defines an interface of optional parameters to the
 // `rollbar.New` constructor.
 type Option interface {
-	Name() string
+	Key() key
 	Value() interface{}
 }
 
 type option struct {
-	name  string
+	key   key
 	value interface{}
 }
 
-func (o *option) Name() string {
-	return o.name
+func (o *option) Key() key {
+	return o.key
 }
 func (o *option) Value() interface{} {
 	return o.value
 }
 
+type key int
+
 const (
-	keyHTTPClient  = "http_client"
-	keyEndpoint    = "endpoint"
-	keyLogger      = "logger"
-	keyDebug       = "debug"
-	keyEnvironment = "environment"
-	keyPlatform    = "platform"
-	keyCodeVersion = "code_version"
-	keyServerHost  = "server_host"
-	keyServerRoot  = "server_root"
-	keyCustom      = "custom"
+	keyHTTPClient key = 1 << iota
+	keyEndpoint
+	keyLogger
+	keyDebug
+	keyEnvironment
+	keyPlatform
+	keyCodeVersion
+	keyServerHost
+	keyServerRoot
+	keyCustom
 )
 
 // WithClient allows you to specify an net/http.Client object to
@@ -47,7 +49,7 @@ const (
 // result of `urlfetch.Client`.
 func WithClient(cl *http.Client) Option {
 	return &option{
-		name:  keyHTTPClient,
+		key:   keyHTTPClient,
 		value: cl,
 	}
 }
@@ -56,7 +58,7 @@ func WithClient(cl *http.Client) Option {
 // The default is DefaultEndpoint.
 func WithEndpoint(s string) Option {
 	return &option{
-		name:  keyEndpoint,
+		key:   keyEndpoint,
 		value: s,
 	}
 }
@@ -66,7 +68,7 @@ func WithEndpoint(s string) Option {
 // logger which writes to os.Stderr.
 func WithLogger(l Logger) Option {
 	return &option{
-		name:  keyLogger,
+		key:   keyLogger,
 		value: l,
 	}
 }
@@ -79,7 +81,7 @@ func WithLogger(l Logger) Option {
 // value specified in ROLLBAR_DEBUG environment variable.
 func WithDebug(b bool) Option {
 	return &option{
-		name:  keyDebug,
+		key:   keyDebug,
 		value: b,
 	}
 }
@@ -92,7 +94,7 @@ func WithDebug(b bool) Option {
 // we'll detect them automatically.
 func WithEnvironment(env string) Option {
 	return &option{
-		name:  keyEnvironment,
+		key:   keyEnvironment,
 		value: env,
 	}
 }
@@ -104,7 +106,7 @@ func WithEnvironment(env string) Option {
 // If this is a client-side event, be sure to specify the platform and use a post_client_item access token.
 func WithPlatform(value string) Option {
 	return &option{
-		name:  keyPlatform,
+		key:   keyPlatform,
 		value: value,
 	}
 }
@@ -117,7 +119,7 @@ func WithPlatform(value string) Option {
 //  - git SHA (i.e. "3da541559918a808c2402bba5012f6c60b27661c")
 func WithCodeVersion(version string) Option {
 	return &option{
-		name:  keyCodeVersion,
+		key:   keyCodeVersion,
 		value: version,
 	}
 }
@@ -125,7 +127,7 @@ func WithCodeVersion(version string) Option {
 // WithServerHost is the server hostname. Will be indexed.
 func WithServerHost(hostname string) Option {
 	return &option{
-		name:  keyServerHost,
+		key:   keyServerHost,
 		value: hostname,
 	}
 }
@@ -134,7 +136,7 @@ func WithServerHost(hostname string) Option {
 // Used to collapse non-project code when displaying tracebacks.
 func WithServerRoot(root string) Option {
 	return &option{
-		name:  keyServerRoot,
+		key:   keyServerRoot,
 		value: root,
 	}
 }
@@ -142,7 +144,7 @@ func WithServerRoot(root string) Option {
 // WithCustom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func WithCustom(version string) Option {
 	return &option{
-		name:  keyCustom,
+		key:   keyCustom,
 		value: version,
 	}
 }
