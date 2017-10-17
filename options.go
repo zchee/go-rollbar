@@ -39,7 +39,6 @@ const (
 	keyCodeVersion
 	keyServerHost
 	keyServerRoot
-	keyCustom
 )
 
 // WithClient allows you to specify an net/http.Client object to
@@ -141,10 +140,48 @@ func WithServerRoot(root string) Option {
 	}
 }
 
+type ErrorOption interface {
+	Key() errorKey
+	Value() interface{}
+}
+
+type errorOption struct {
+	key   errorKey
+	value interface{}
+}
+
+func (o *errorOption) Key() errorKey {
+	return o.key
+}
+func (o *errorOption) Value() interface{} {
+	return o.value
+}
+
+type errorKey int
+
+const (
+	keyCustom errorKey = 1 << iota
+	keyUUID
+)
+
 // WithCustom is any arbitrary metadata you want to send. "custom" itself should be an object.
-func WithCustom(version string) Option {
-	return &option{
+func WithCustom(version string) ErrorOption {
+	return &errorOption{
 		key:   keyCustom,
 		value: version,
+	}
+}
+
+// WithUUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
+func WithUUID(uuid string) ErrorOption {
+	return &errorOption{
+		key:   keyUUID,
+		value: uuid,
 	}
 }

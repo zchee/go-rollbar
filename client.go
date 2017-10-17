@@ -78,9 +78,11 @@ func New(token string, options ...Option) *Client {
 	if _, ok := logger.(nilLogger); debug && ok {
 		logger = traceLogger{os.Stderr}
 	}
-
 	if platform == "" {
 		platform = runtime.GOOS
+	}
+	if serverHost == "" {
+		serverHost, _ = os.Hostname()
 	}
 
 	return &Client{
@@ -98,36 +100,40 @@ func New(token string, options ...Option) *Client {
 }
 
 // payload creates the rollbar payload data.
-func (c *Client) payload(level Level, err error) *api.Payload {
+func (c *Client) payload(level Level, err error, options ...ErrorOption) *api.Payload {
 	title := "<nil>"
 	if err != nil {
 		title = err.Error()
 	}
-	timestamp := time.Now().Unix()
-	if c.serverHost == "" {
-		c.serverHost, _ = os.Hostname()
+
+	var id string
+	for _, o := range options {
+		switch o.Key() {
+		case keyUUID:
+			id = o.Value().(string)
+		}
 	}
-	stack := CreateStack(4)
+	if id == "" {
+		id = uuid.New().String()
+	}
 
 	data := &api.Data{
 		Title:       title,
-		Body:        errorBody(err, stack),
+		Body:        errorBody(err, CreateStack(4)),
 		Environment: c.environment,
 		Level:       string(level),
-		Timestamp:   timestamp,
+		Timestamp:   time.Now().Unix(),
 		Platform:    c.platform,
 		Language:    language,
 		Server: &api.Server{
 			Host: c.serverHost,
+			Root: c.serverRoot,
 		},
 		Notifier: &api.Notifier{
 			Name:    Name,
 			Version: Version,
 		},
-		UUID: uuid.New().String(),
-	}
-	if c.codeVersion != "" {
-		data.CodeVersion = c.codeVersion
+		UUID: id,
 	}
 
 	return &api.Payload{
@@ -137,12 +143,12 @@ func (c *Client) payload(level Level, err error) *api.Payload {
 }
 
 // post posts payload to rollbar.
-func (c *Client) post(pctx context.Context, level Level, err error) error {
+func (c *Client) post(pctx context.Context, level Level, err error, options ...ErrorOption) error {
 	if c.token == "" {
 		return errors.New("empty token")
 	}
 
-	payload := c.payload(level, err)
+	payload := c.payload(level, err, options...)
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return errors.Wrap(err, "failed to encode payload")
@@ -196,36 +202,36 @@ func (c *Client) parseResponse(ctx context.Context, rdr io.Reader, data interfac
 }
 
 // Debug sends the error to rollbar with debug level.
-func (c *Client) Debug(ctx context.Context, err error) {
-	if err := c.post(ctx, DebugLevel, err); err != nil {
+func (c *Client) Debug(ctx context.Context, err error, options ...ErrorOption) {
+	if err := c.post(ctx, DebugLevel, err, options...); err != nil {
 		c.logger.Debug(ctx, "rollbar: Debug: %+v", err)
 	}
 }
 
 // Info sends the error to rollbar with info level.
-func (c *Client) Info(ctx context.Context, err error) {
-	if err := c.post(ctx, InfoLevel, err); err != nil {
+func (c *Client) Info(ctx context.Context, err error, options ...ErrorOption) {
+	if err := c.post(ctx, InfoLevel, err, options...); err != nil {
 		c.logger.Debug(ctx, "rollbar: Info: %+v", err)
 	}
 }
 
 // Error sends the error to rollbar with error level.
-func (c *Client) Error(ctx context.Context, err error) {
-	if err := c.post(ctx, ErrorLevel, err); err != nil {
+func (c *Client) Error(ctx context.Context, err error, options ...ErrorOption) {
+	if err := c.post(ctx, ErrorLevel, err, options...); err != nil {
 		c.logger.Debug(ctx, "rollbar: Error: %+v", err)
 	}
 }
 
 // Warn sends the error to rollbar with warn level.
-func (c *Client) Warn(ctx context.Context, err error) {
-	if err := c.post(ctx, WarnLevel, err); err != nil {
+func (c *Client) Warn(ctx context.Context, err error, options ...ErrorOption) {
+	if err := c.post(ctx, WarnLevel, err, options...); err != nil {
 		c.logger.Debug(ctx, "rollbar: Warn: %+v", err)
 	}
 }
 
 // Critical sends the error to rollbar with critical level.
-func (c *Client) Critical(ctx context.Context, err error) {
-	if err := c.post(ctx, CriticalLevel, err); err != nil {
+func (c *Client) Critical(ctx context.Context, err error, options ...ErrorOption) {
+	if err := c.post(ctx, CriticalLevel, err, options...); err != nil {
 		c.logger.Debug(ctx, "rollbar: Critical: %+v", err)
 	}
 }
