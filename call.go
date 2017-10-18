@@ -5,6 +5,7 @@
 package rollbar
 
 import (
+	api "github.com/zchee/go-rollbar/api/v1"
 	"golang.org/x/net/context"
 )
 
@@ -18,6 +19,15 @@ type callOption struct {
 	err    error
 	custom map[string]interface{}
 	id     string
+}
+
+func joinPayload(payload *api.Payload, opt callOption) {
+	if opt.custom != nil {
+		payload.Data.Custom = opt.custom
+	}
+	if opt.id != "" {
+		payload.Data.UUID = opt.id
+	}
 }
 
 type DebugCall struct {
@@ -53,8 +63,7 @@ func (c *DebugCall) UUID(id string) Call {
 
 func (c *DebugCall) Do(ctx context.Context) error {
 	payload := c.client.payload(DebugLevel, c.err)
-	payload.Data.Custom = c.custom
-	payload.Data.UUID = c.id
+	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
 }
 
@@ -91,8 +100,7 @@ func (c *InfoCall) UUID(id string) Call {
 
 func (c *InfoCall) Do(ctx context.Context) error {
 	payload := c.client.payload(InfoLevel, c.err)
-	payload.Data.Custom = c.custom
-	payload.Data.UUID = c.id
+	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
 }
 
@@ -129,8 +137,7 @@ func (c *ErrorCall) UUID(id string) Call {
 
 func (c *ErrorCall) Do(ctx context.Context) error {
 	payload := c.client.payload(ErrorLevel, c.err)
-	payload.Data.Custom = c.custom
-	payload.Data.UUID = c.id
+	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
 }
 
@@ -167,8 +174,7 @@ func (c *WarnCall) UUID(id string) Call {
 
 func (c *WarnCall) Do(ctx context.Context) error {
 	payload := c.client.payload(WarnLevel, c.err)
-	payload.Data.Custom = c.custom
-	payload.Data.UUID = c.id
+	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
 }
 
@@ -205,7 +211,6 @@ func (c *CriticalCall) UUID(id string) Call {
 
 func (c *CriticalCall) Do(ctx context.Context) error {
 	payload := c.client.payload(CriticalLevel, c.err)
-	payload.Data.Custom = c.custom
-	payload.Data.UUID = c.id
+	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
 }
