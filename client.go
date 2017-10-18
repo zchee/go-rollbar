@@ -98,7 +98,8 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 			Host: c.serverHost,
 			Root: c.serverRoot,
 		},
-		Title: title,
+		Fingerprint: stack.Fingerprint(),
+		Title:       title,
 		Notifier: &api.Notifier{
 			Name:    Name,
 			Version: Version,

@@ -5,6 +5,8 @@
 package rollbar
 
 import (
+	"fmt"
+	"hash/crc32"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -47,6 +49,14 @@ func CreateStackFromCaller(callers []uintptr) Stack {
 	}
 
 	return stack
+}
+
+func (s Stack) Fingerprint() string {
+	h := crc32.NewIEEE()
+	for _, frame := range s {
+		fmt.Fprintf(h, "%s%s%d", frame.Filename, frame.Method, frame.Lineno)
+	}
+	return fmt.Sprintf("%x", h.Sum32())
 }
 
 func funcNameFromFunc(fn *runtime.Func) string {
