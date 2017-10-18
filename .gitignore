@@ -21,3 +21,6 @@
 
 # binary
 bin/*
+
+# vendor
+vendor/*
