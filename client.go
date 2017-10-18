@@ -41,75 +41,41 @@ type httpClient struct {
 	serverRoot  string
 }
 
+var defaultHTTPClient = httpClient{
+	client:      http.DefaultClient,
+	endpoint:    api.DefaultEndpoint,
+	logger:      nilLogger{},
+	environment: "development",
+	platform:    runtime.GOOS,
+}
+
 // New creates a new REST rollbar API client.
 //
 // The `token` is required, other optional parameters can be passed using the
 // various `With...` functions.
 func New(token string, options ...Option) Rollbar {
-	cl := http.DefaultClient
-	endpoint := api.DefaultEndpoint
-	debug, _ := strconv.ParseBool(os.Getenv("ROLLBAR_DEBUG"))
-	environment := "development"
-	var (
-		logger      Logger = nilLogger{}
-		platform    string
-		codeVersion string
-		serverHost  string
-		serverRoot  string
-	)
+	client := defaultHTTPClient
+	client.token = token
+	if debug, err := strconv.ParseBool(os.Getenv("ROLLBAR_DEBUG")); err == nil && debug {
+		client.debug = debug
+	}
 
 	for _, o := range options {
-		switch o.Key() {
-		case keyHTTPClient:
-			cl = o.Value().(*http.Client)
-		case keyEndpoint:
-			endpoint = o.Value().(string)
-		case keyDebug:
-			debug = o.Value().(bool)
-		case keyLogger:
-			logger = o.Value().(Logger)
-		case keyEnvironment:
-			environment = o.Value().(string)
-		case keyPlatform:
-			platform = o.Value().(string)
-		case keyCodeVersion:
-			codeVersion = o.Value().(string)
-		case keyServerHost:
-			serverHost = o.Value().(string)
-		case keyServerRoot:
-			serverRoot = o.Value().(string)
-		}
+		o(&client)
 	}
-
-	if _, ok := logger.(nilLogger); debug && ok {
-		logger = traceLogger{os.Stderr}
+	if _, ok := client.logger.(nilLogger); client.debug && ok {
+		client.logger = traceLogger{os.Stderr}
 	}
-	if platform == "" {
-		platform = runtime.GOOS
-	}
-	if serverHost == "" {
-		serverHost, _ = os.Hostname()
-	}
-
-	client := &httpClient{
-		token:       token,
-		client:      cl,
-		endpoint:    endpoint,
-		debug:       debug,
-		logger:      logger,
-		environment: environment,
-		platform:    platform,
-		codeVersion: codeVersion,
-		serverHost:  serverHost,
-		serverRoot:  serverRoot,
+	if client.serverHost == "" {
+		client.serverHost, _ = os.Hostname()
 	}
 
 	return &Client{
-		debug:        &DebugService{client: client},
-		info:         &InfoService{client: client},
-		errorService: &ErrorService{client: client},
-		warn:         &WarnService{client: client},
-		critical:     &CriticalService{client: client},
+		debug:        &DebugService{client: &client},
+		info:         &InfoService{client: &client},
+		errorService: &ErrorService{client: &client},
+		warn:         &WarnService{client: &client},
+		critical:     &CriticalService{client: &client},
 	}
 }
 

@@ -10,36 +10,7 @@ import (
 
 // Option defines an interface of optional parameters to the
 // `rollbar.New` constructor.
-type Option interface {
-	Key() key
-	Value() interface{}
-}
-
-type option struct {
-	key   key
-	value interface{}
-}
-
-func (o *option) Key() key {
-	return o.key
-}
-func (o *option) Value() interface{} {
-	return o.value
-}
-
-type key int
-
-const (
-	keyHTTPClient key = 1 << iota
-	keyEndpoint
-	keyLogger
-	keyDebug
-	keyEnvironment
-	keyPlatform
-	keyCodeVersion
-	keyServerHost
-	keyServerRoot
-)
+type Option func(*httpClient)
 
 // WithClient allows you to specify an net/http.Client object to
 // use to communicate with the Rollbar endpoints.
@@ -47,18 +18,16 @@ const (
 // For example, if you need to use this in Google App Engine, you can pass it the
 // result of `urlfetch.Client`.
 func WithClient(cl *http.Client) Option {
-	return &option{
-		key:   keyHTTPClient,
-		value: cl,
+	return func(c *httpClient) {
+		c.client = cl
 	}
 }
 
 // WithEndpoint allows you to specify an alternate API endpoint.
 // The default is DefaultEndpoint.
 func WithEndpoint(s string) Option {
-	return &option{
-		key:   keyEndpoint,
-		value: s,
+	return func(c *httpClient) {
+		c.endpoint = s
 	}
 }
 
@@ -66,9 +35,8 @@ func WithEndpoint(s string) Option {
 // If not specified and `WithDebug` is enabled, then a default
 // logger which writes to os.Stderr.
 func WithLogger(l Logger) Option {
-	return &option{
-		key:   keyLogger,
-		value: l,
+	return func(c *httpClient) {
+		c.logger = l
 	}
 }
 
@@ -79,9 +47,8 @@ func WithLogger(l Logger) Option {
 // If one is not specified, the default value is false, or the
 // value specified in ROLLBAR_DEBUG environment variable.
 func WithDebug(b bool) Option {
-	return &option{
-		key:   keyDebug,
-		value: b,
+	return func(c *httpClient) {
+		c.debug = b
 	}
 }
 
@@ -92,9 +59,8 @@ func WithDebug(b bool) Option {
 // You don't need to configure anything in the Rollbar UI for new environment names;
 // we'll detect them automatically.
 func WithEnvironment(env string) Option {
-	return &option{
-		key:   keyEnvironment,
-		value: env,
+	return func(c *httpClient) {
+		c.environment = env
 	}
 }
 
@@ -103,10 +69,9 @@ func WithEnvironment(env string) Option {
 // Meaningful platform names:
 //  "browser", "android", "ios", "flash", "client", "heroku", "google-app-engine"
 // If this is a client-side event, be sure to specify the platform and use a post_client_item access token.
-func WithPlatform(value string) Option {
-	return &option{
-		key:   keyPlatform,
-		value: value,
+func WithPlatform(platform string) Option {
+	return func(c *httpClient) {
+		c.platform = platform
 	}
 }
 
@@ -117,71 +82,22 @@ func WithPlatform(value string) Option {
 //  - integer (i.e. "45")
 //  - git SHA (i.e. "3da541559918a808c2402bba5012f6c60b27661c")
 func WithCodeVersion(version string) Option {
-	return &option{
-		key:   keyCodeVersion,
-		value: version,
+	return func(c *httpClient) {
+		c.codeVersion = version
 	}
 }
 
 // WithServerHost is the server hostname. Will be indexed.
 func WithServerHost(hostname string) Option {
-	return &option{
-		key:   keyServerHost,
-		value: hostname,
+	return func(c *httpClient) {
+		c.serverHost = hostname
 	}
 }
 
 // WithServerRoot is the path to the application code root. Not including the final slash.
 // Used to collapse non-project code when displaying tracebacks.
 func WithServerRoot(root string) Option {
-	return &option{
-		key:   keyServerRoot,
-		value: root,
-	}
-}
-
-type ErrorOption interface {
-	Key() errorKey
-	Value() interface{}
-}
-
-type errorOption struct {
-	key   errorKey
-	value interface{}
-}
-
-func (o *errorOption) Key() errorKey {
-	return o.key
-}
-func (o *errorOption) Value() interface{} {
-	return o.value
-}
-
-type errorKey int
-
-const (
-	keyCustom errorKey = 1 << iota
-	keyUUID
-)
-
-// WithCustom is any arbitrary metadata you want to send. "custom" itself should be an object.
-func WithCustom(customs map[string]interface{}) ErrorOption {
-	return &errorOption{
-		key:   keyCustom,
-		value: customs,
-	}
-}
-
-// WithUUID a string, up to 36 characters, that uniquely identifies this occurrence.
-// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
-// We recommend using a UUID4 (16 random bytes).
-// The UUID space is unique to each project, and can be used to look up an occurrence later.
-// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
-// one will be discarded.
-// While optional, it is recommended that all clients generate and provide this field.
-func WithUUID(uuid string) ErrorOption {
-	return &errorOption{
-		key:   keyUUID,
-		value: uuid,
+	return func(c *httpClient) {
+		c.serverRoot = root
 	}
 }

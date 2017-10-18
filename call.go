@@ -85,11 +85,19 @@ type DebugCall struct {
 	callOption
 }
 
+// Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *DebugCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
 	return c
 }
 
+// UUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
 func (c *DebugCall) UUID(id string) Call {
 	c.id = id
 	return c
@@ -107,11 +115,19 @@ type InfoCall struct {
 	callOption
 }
 
+// Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *InfoCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
 	return c
 }
 
+// UUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
 func (c *InfoCall) UUID(id string) Call {
 	c.id = id
 	return c
@@ -129,11 +145,19 @@ type ErrorCall struct {
 	callOption
 }
 
+// Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *ErrorCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
 	return c
 }
 
+// UUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
 func (c *ErrorCall) UUID(id string) Call {
 	c.id = id
 	return c
@@ -151,11 +175,19 @@ type WarnCall struct {
 	callOption
 }
 
+// Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *WarnCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
 	return c
 }
 
+// UUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
 func (c *WarnCall) UUID(id string) Call {
 	c.id = id
 	return c
@@ -173,11 +205,19 @@ type CriticalCall struct {
 	callOption
 }
 
+// Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *CriticalCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
 	return c
 }
 
+// UUID a string, up to 36 characters, that uniquely identifies this occurrence.
+// While it can now be any latin1 string, this may change to be a 16 byte field in the future.
+// We recommend using a UUID4 (16 random bytes).
+// The UUID space is unique to each project, and can be used to look up an occurrence later.
+// It is also used to detect duplicate requests. If you send the same UUID in two payloads, the second
+// one will be discarded.
+// While optional, it is recommended that all clients generate and provide this field.
 func (c *CriticalCall) UUID(id string) Call {
 	c.id = id
 	return c
