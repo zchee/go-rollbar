@@ -12,7 +12,7 @@ import (
 type Call interface {
 	Custom(map[string]interface{}) Call
 	UUID(string) Call
-	Do(context.Context) error
+	Do(context.Context) (*api.Response, error)
 }
 
 type callOption struct {
@@ -61,7 +61,7 @@ func (c *DebugCall) UUID(id string) Call {
 	return c
 }
 
-func (c *DebugCall) Do(ctx context.Context) error {
+func (c *DebugCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(DebugLevel, c.err)
 	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
@@ -98,7 +98,7 @@ func (c *InfoCall) UUID(id string) Call {
 	return c
 }
 
-func (c *InfoCall) Do(ctx context.Context) error {
+func (c *InfoCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(InfoLevel, c.err)
 	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
@@ -135,7 +135,7 @@ func (c *ErrorCall) UUID(id string) Call {
 	return c
 }
 
-func (c *ErrorCall) Do(ctx context.Context) error {
+func (c *ErrorCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(ErrorLevel, c.err)
 	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
@@ -172,7 +172,7 @@ func (c *WarnCall) UUID(id string) Call {
 	return c
 }
 
-func (c *WarnCall) Do(ctx context.Context) error {
+func (c *WarnCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(WarnLevel, c.err)
 	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
@@ -209,7 +209,7 @@ func (c *CriticalCall) UUID(id string) Call {
 	return c
 }
 
-func (c *CriticalCall) Do(ctx context.Context) error {
+func (c *CriticalCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(CriticalLevel, c.err)
 	joinPayload(payload, c.callOption)
 	return c.client.post(ctx, payload)
