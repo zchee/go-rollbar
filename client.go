@@ -21,11 +21,11 @@ import (
 )
 
 type Client struct {
-	debug        *DebugService
-	info         *InfoService
-	errorService *ErrorService
-	warn         *WarnService
-	critical     *CriticalService
+	debugClient    *httpClient
+	infoClient     *httpClient
+	errorClient    *httpClient
+	warnClient     *httpClient
+	criticalClient *httpClient
 }
 
 type httpClient struct {
@@ -71,11 +71,11 @@ func New(token string, options ...Option) Rollbar {
 	}
 
 	return &Client{
-		debug:        &DebugService{client: &client},
-		info:         &InfoService{client: &client},
-		errorService: &ErrorService{client: &client},
-		warn:         &WarnService{client: &client},
-		critical:     &CriticalService{client: &client},
+		debugClient:    &client,
+		infoClient:     &client,
+		errorClient:    &client,
+		warnClient:     &client,
+		criticalClient: &client,
 	}
 }
 

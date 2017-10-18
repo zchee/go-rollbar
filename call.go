@@ -20,69 +20,17 @@ type callOption struct {
 	id     string
 }
 
-type DebugService struct {
+type DebugCall struct {
 	client *httpClient
+	callOption
 }
 
 // Debug sends the error to rollbar with debug level.
 func (c *Client) Debug(err error) Call {
 	var call DebugCall
-	call.service = c.debug
+	call.client = c.debugClient
 	call.err = err
 	return &call
-}
-
-type InfoService struct {
-	client *httpClient
-}
-
-// Info sends the error to rollbar with info level.
-func (c *Client) Info(err error) Call {
-	var call InfoCall
-	call.service = c.info
-	call.err = err
-	return &call
-}
-
-type ErrorService struct {
-	client *httpClient
-}
-
-// Error sends the error to rollbar with error level.
-func (c *Client) Error(err error) Call {
-	var call ErrorCall
-	call.service = c.errorService
-	call.err = err
-	return &call
-}
-
-type WarnService struct {
-	client *httpClient
-}
-
-// Warn sends the error to rollbar with warning level.
-func (c *Client) Warn(err error) Call {
-	var call WarnCall
-	call.service = c.warn
-	call.err = err
-	return &call
-}
-
-type CriticalService struct {
-	client *httpClient
-}
-
-// Critical sends the error to rollbar with critical level.
-func (c *Client) Critical(err error) Call {
-	var call CriticalCall
-	call.service = c.critical
-	call.err = err
-	return &call
-}
-
-type DebugCall struct {
-	service *DebugService
-	callOption
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -104,15 +52,23 @@ func (c *DebugCall) UUID(id string) Call {
 }
 
 func (c *DebugCall) Do(ctx context.Context) error {
-	payload := c.service.client.payload(DebugLevel, c.err)
+	payload := c.client.payload(DebugLevel, c.err)
 	payload.Data.Custom = c.custom
 	payload.Data.UUID = c.id
-	return c.service.client.post(ctx, payload)
+	return c.client.post(ctx, payload)
 }
 
 type InfoCall struct {
-	service *InfoService
+	client *httpClient
 	callOption
+}
+
+// Info sends the error to rollbar with info level.
+func (c *Client) Info(err error) Call {
+	var call InfoCall
+	call.client = c.infoClient
+	call.err = err
+	return &call
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -134,15 +90,23 @@ func (c *InfoCall) UUID(id string) Call {
 }
 
 func (c *InfoCall) Do(ctx context.Context) error {
-	payload := c.service.client.payload(InfoLevel, c.err)
+	payload := c.client.payload(InfoLevel, c.err)
 	payload.Data.Custom = c.custom
 	payload.Data.UUID = c.id
-	return c.service.client.post(ctx, payload)
+	return c.client.post(ctx, payload)
 }
 
 type ErrorCall struct {
-	service *ErrorService
+	client *httpClient
 	callOption
+}
+
+// Error sends the error to rollbar with error level.
+func (c *Client) Error(err error) Call {
+	var call ErrorCall
+	call.client = c.errorClient
+	call.err = err
+	return &call
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -164,15 +128,23 @@ func (c *ErrorCall) UUID(id string) Call {
 }
 
 func (c *ErrorCall) Do(ctx context.Context) error {
-	payload := c.service.client.payload(ErrorLevel, c.err)
+	payload := c.client.payload(ErrorLevel, c.err)
 	payload.Data.Custom = c.custom
 	payload.Data.UUID = c.id
-	return c.service.client.post(ctx, payload)
+	return c.client.post(ctx, payload)
 }
 
 type WarnCall struct {
-	service *WarnService
+	client *httpClient
 	callOption
+}
+
+// Warn sends the error to rollbar with warning level.
+func (c *Client) Warn(err error) Call {
+	var call WarnCall
+	call.client = c.warnClient
+	call.err = err
+	return &call
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -194,15 +166,23 @@ func (c *WarnCall) UUID(id string) Call {
 }
 
 func (c *WarnCall) Do(ctx context.Context) error {
-	payload := c.service.client.payload(WarnLevel, c.err)
+	payload := c.client.payload(WarnLevel, c.err)
 	payload.Data.Custom = c.custom
 	payload.Data.UUID = c.id
-	return c.service.client.post(ctx, payload)
+	return c.client.post(ctx, payload)
 }
 
 type CriticalCall struct {
-	service *CriticalService
+	client *httpClient
 	callOption
+}
+
+// Critical sends the error to rollbar with critical level.
+func (c *Client) Critical(err error) Call {
+	var call CriticalCall
+	call.client = c.criticalClient
+	call.err = err
+	return &call
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -224,8 +204,8 @@ func (c *CriticalCall) UUID(id string) Call {
 }
 
 func (c *CriticalCall) Do(ctx context.Context) error {
-	payload := c.service.client.payload(CriticalLevel, c.err)
+	payload := c.client.payload(CriticalLevel, c.err)
 	payload.Data.Custom = c.custom
 	payload.Data.UUID = c.id
-	return c.service.client.post(ctx, payload)
+	return c.client.post(ctx, payload)
 }
