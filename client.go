@@ -122,7 +122,7 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) error {
 	}
 	if c.debug {
 		out, _ := json.MarshalIndent(payload, "", "  ")
-		c.logger.Debug(pctx, string(out))
+		c.logger.Debugf(pctx, string(out)+"\n")
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.endpoint, bytes.NewReader(data))
@@ -153,16 +153,16 @@ func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader, data inte
 		var buf bytes.Buffer
 		io.Copy(&buf, rdr)
 
-		c.logger.Debug(ctx, "-----> %s (response)", c.endpoint)
+		c.logger.Debugf(ctx, "-----> %s (response)\n", c.endpoint)
 		var m api.Response
 		if err := json.Unmarshal(buf.Bytes(), &m); err != nil {
-			c.logger.Debug(ctx, "failed to unmarshal payload: %s", err)
-			c.logger.Debug(ctx, "%s", buf.String())
+			c.logger.Debugf(ctx, "failed to unmarshal payload: %s\n", err)
+			c.logger.Debugf(ctx, "%s\n", buf.String())
 		} else {
 			formatted, _ := json.MarshalIndent(m, "", "  ")
-			c.logger.Debug(ctx, "%s", formatted)
+			c.logger.Debugf(ctx, "%s", formatted)
 		}
-		c.logger.Debug(ctx, "<----- %s (response)", c.endpoint)
+		c.logger.Debugf(ctx, "<----- %s (response)\n", c.endpoint)
 		rdr = &buf
 	}
 	return json.NewDecoder(rdr).Decode(&data)

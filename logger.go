@@ -7,7 +7,6 @@ package rollbar
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"golang.org/x/net/context"
 )
@@ -18,33 +17,25 @@ import (
 // In particular, `Debug` will only be called if `WithDebug`
 // is provided to the constructor.
 type Logger interface {
-	Debug(context.Context, string, ...interface{})
-	Info(context.Context, string, ...interface{})
+	Debugf(context.Context, string, ...interface{})
+	Infof(context.Context, string, ...interface{})
 }
 
 type nilLogger struct{}
 
-func (_ nilLogger) Debug(context.Context, string, ...interface{}) {}
-func (_ nilLogger) Info(context.Context, string, ...interface{})  {}
+func (nilLogger) Debugf(context.Context, string, ...interface{}) {}
+func (nilLogger) Infof(context.Context, string, ...interface{})  {}
 
 type traceLogger struct {
 	w io.Writer
 }
 
 // Debug outputs the debug log output.
-func (l traceLogger) Debug(_ context.Context, f string, args ...interface{}) {
-	fmt.Fprintf(l.w, newLine(f), args...)
+func (l traceLogger) Debugf(_ context.Context, format string, args ...interface{}) {
+	fmt.Fprintf(l.w, format, args...)
 }
 
 // Info outputs the info log output.
-func (l traceLogger) Info(_ context.Context, f string, args ...interface{}) {
-	fmt.Fprintf(l.w, newLine(f), args...)
-}
-
-// newLine joins the new line if not present.
-func newLine(s string) string {
-	if !strings.HasSuffix(s, "\n") {
-		s = s + "\n"
-	}
-	return s
+func (l traceLogger) Infof(_ context.Context, format string, args ...interface{}) {
+	fmt.Fprintf(l.w, format, args...)
 }
