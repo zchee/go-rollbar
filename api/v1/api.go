@@ -195,21 +195,17 @@ type Context struct {
 	// Pre is the list of lines of code before the "code" line
 	Pre []string `json:"pre"`
 	// Post is the list of line of code after the "code" line.
-	Post []interface{} `json:"post"`
+	Post []string `json:"post"`
 }
 
 // Locals is the object of local variables for the method/function call.
 // The values of variables from argspec, vararspec and keywordspec
 // can be found in locals.
 type Locals struct {
-	Request string        `json:"request"`
-	User    string        `json:"user"`
-	Args    []interface{} `json:"args"`
-	Kwargs  *Kwargs       `json:"kwargs"`
-}
-
-type Kwargs struct {
-	Level string `json:"level"`
+	Request string            `json:"request"`
+	User    string            `json:"user"`
+	Args    []interface{}     `json:"args"`
+	Kwargs  map[string]string `json:"kwargs"`
 }
 
 // Request is the data about the request this event occurred in.
@@ -217,15 +213,17 @@ type Request struct {
 	// URL is full URL where this event occurred.
 	URL string `json:"url"`
 	// Method is the request method.
-	Method  string   `json:"method"`
-	Headers *Headers `json:"headers"`
-	Params  *Params  `json:"params"`
+	Method string `json:"method"`
+	// Headers object containing the request headers.
+	// Header names should be formatted like they are in HTTP.
+	Headers map[string][]string `json:"headers"`
+	Params  *Params             `json:"params"`
 	// GET query string params.
-	GET []interface{} `json:"GET"`
+	GET map[string]interface{} `json:"GET"`
 	// QueryString is the raw query string.
 	QueryString string `json:"query_string"`
 	// POST POST params.
-	POST []interface{} `json:"POST"`
+	POST map[string]interface{} `json:"POST"`
 	// Body is the raw POST body.
 	Body string `json:"body"`
 	// UserIP is the user's IP address as a string.
@@ -234,17 +232,10 @@ type Request struct {
 	UserIP string `json:"user_ip"`
 }
 
-// Headers object containing the request headers.
-// Header names should be formatted like they are in HTTP.
-type Headers struct {
-	Accept  string `json:"Accept"`
-	Referer string `json:"Referer"`
-}
-
-// Params any routing parameters.
+// Params any routing parameters. (i.e. for use with Rails Routes)
 type Params struct {
-	Action     string `json:"action"`
 	Controller string `json:"controller"`
+	Action     string `json:"action"`
 }
 
 // Person is the user affected by this event. Will be indexed by ID, username, and email.
@@ -255,7 +246,7 @@ type Person struct {
 	ID string `json:"id"`
 	// Username a string up to 255 characters.
 	Username string `json:"username,omitempty"`
-	// Email a string up to 255 characters
+	// Email a string up to 255 characters.
 	Email string `json:"email,omitempty"`
 }
 
