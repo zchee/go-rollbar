@@ -13,6 +13,7 @@ import (
 
 type Call interface {
 	Request(*http.Request) Call
+	Person(string, string, string) Call
 	Custom(map[string]interface{}) Call
 	UUID(string) Call
 	Do(context.Context) (*api.Response, error)
@@ -21,6 +22,7 @@ type Call interface {
 type callOption struct {
 	err    error
 	req    *http.Request
+	person *api.Person
 	custom map[string]interface{}
 	id     string
 }
@@ -28,6 +30,9 @@ type callOption struct {
 func joinPayload(payload *api.Payload, opt callOption) {
 	if opt.req != nil {
 		payload.Data.Request = errorRequest(opt.req)
+	}
+	if opt.person != nil {
+		payload.Data.Person = opt.person
 	}
 	if opt.custom != nil {
 		payload.Data.Custom = opt.custom
@@ -53,6 +58,22 @@ func (c *client) Debug(err error) Call {
 // Request is a data about the request this event occurred in.
 func (c *DebugCall) Request(req *http.Request) Call {
 	c.req = req
+	return c
+}
+
+// Person is the user affected by this event. Will be indexed by ID, username, and email.
+// People are stored in Rollbar keyed by ID. If you send a multiple different usernames/emails for the
+// same ID, the last received values will overwrite earlier ones.
+func (c *DebugCall) Person(id, username, email string) Call {
+	if id == "" { // id is required
+		return c
+	}
+
+	c.person = &api.Person{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
 	return c
 }
 
@@ -99,6 +120,22 @@ func (c *InfoCall) Request(req *http.Request) Call {
 	return c
 }
 
+// Person is the user affected by this event. Will be indexed by ID, username, and email.
+// People are stored in Rollbar keyed by ID. If you send a multiple different usernames/emails for the
+// same ID, the last received values will overwrite earlier ones.
+func (c *InfoCall) Person(id, username, email string) Call {
+	if id == "" { // id is required
+		return c
+	}
+
+	c.person = &api.Person{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+	return c
+}
+
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *InfoCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
@@ -139,6 +176,22 @@ func (c *client) Error(err error) Call {
 // Request is a data about the request this event occurred in.
 func (c *ErrorCall) Request(req *http.Request) Call {
 	c.req = req
+	return c
+}
+
+// Person is the user affected by this event. Will be indexed by ID, username, and email.
+// People are stored in Rollbar keyed by ID. If you send a multiple different usernames/emails for the
+// same ID, the last received values will overwrite earlier ones.
+func (c *ErrorCall) Person(id, username, email string) Call {
+	if id == "" { // id is required
+		return c
+	}
+
+	c.person = &api.Person{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
 	return c
 }
 
@@ -185,6 +238,22 @@ func (c *WarnCall) Request(req *http.Request) Call {
 	return c
 }
 
+// Person is the user affected by this event. Will be indexed by ID, username, and email.
+// People are stored in Rollbar keyed by ID. If you send a multiple different usernames/emails for the
+// same ID, the last received values will overwrite earlier ones.
+func (c *WarnCall) Person(id, username, email string) Call {
+	if id == "" { // id is required
+		return c
+	}
+
+	c.person = &api.Person{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+	return c
+}
+
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *WarnCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
@@ -225,6 +294,22 @@ func (c *client) Critical(err error) Call {
 // Request is a data about the request this event occurred in.
 func (c *CriticalCall) Request(req *http.Request) Call {
 	c.req = req
+	return c
+}
+
+// Person is the user affected by this event. Will be indexed by ID, username, and email.
+// People are stored in Rollbar keyed by ID. If you send a multiple different usernames/emails for the
+// same ID, the last received values will overwrite earlier ones.
+func (c *CriticalCall) Person(id, username, email string) Call {
+	if id == "" { // id is required
+		return c
+	}
+
+	c.person = &api.Person{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
 	return c
 }
 
