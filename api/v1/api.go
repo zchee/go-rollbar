@@ -92,9 +92,9 @@ type Body struct {
 	Telemetry *Telemetry `json:"telemetry,omitempty"`
 	Trace     *Trace     `json:"trace,omitempty"`
 	// TraceChain is the used for exceptions with inner exceptions or causes.
-	TraceChain  []interface{} `json:"trace_chain,omitempty"`
-	Message     *Message      `json:"message,omitempty"`
-	CrashReport *CrashReport  `json:"crash_report,omitempty"`
+	TraceChain  []*Trace     `json:"trace_chain,omitempty"`
+	Message     *Message     `json:"message,omitempty"`
+	CrashReport *CrashReport `json:"crash_report,omitempty"`
 }
 
 // Telemetry only applicable if you are sending telemetry data.
