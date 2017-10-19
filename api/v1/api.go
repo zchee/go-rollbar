@@ -219,11 +219,11 @@ type Request struct {
 	Headers map[string][]string `json:"headers"`
 	Params  *Params             `json:"params"`
 	// GET query string params.
-	GET map[string]interface{} `json:"GET"`
+	GET map[string][]string `json:"GET"`
 	// QueryString is the raw query string.
 	QueryString string `json:"query_string"`
 	// POST POST params.
-	POST map[string]interface{} `json:"POST"`
+	POST map[string][]string `json:"POST"`
 	// Body is the raw POST body.
 	Body string `json:"body"`
 	// UserIP is the user's IP address as a string.
