@@ -11,7 +11,7 @@ const (
 	language = "go"
 )
 
-type Rollbar interface {
+type Client interface {
 	Debug(error) Call
 	Info(error) Call
 	Error(error) Call

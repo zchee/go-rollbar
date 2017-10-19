@@ -36,7 +36,7 @@ type DebugCall struct {
 }
 
 // Debug sends the error to rollbar with debug level.
-func (c *Client) Debug(err error) Call {
+func (c *client) Debug(err error) Call {
 	var call DebugCall
 	call.client = c.debugClient
 	call.err = err
@@ -73,7 +73,7 @@ type InfoCall struct {
 }
 
 // Info sends the error to rollbar with info level.
-func (c *Client) Info(err error) Call {
+func (c *client) Info(err error) Call {
 	var call InfoCall
 	call.client = c.infoClient
 	call.err = err
@@ -110,7 +110,7 @@ type ErrorCall struct {
 }
 
 // Error sends the error to rollbar with error level.
-func (c *Client) Error(err error) Call {
+func (c *client) Error(err error) Call {
 	var call ErrorCall
 	call.client = c.errorClient
 	call.err = err
@@ -147,7 +147,7 @@ type WarnCall struct {
 }
 
 // Warn sends the error to rollbar with warning level.
-func (c *Client) Warn(err error) Call {
+func (c *client) Warn(err error) Call {
 	var call WarnCall
 	call.client = c.warnClient
 	call.err = err
@@ -184,7 +184,7 @@ type CriticalCall struct {
 }
 
 // Critical sends the error to rollbar with critical level.
-func (c *Client) Critical(err error) Call {
+func (c *client) Critical(err error) Call {
 	var call CriticalCall
 	call.client = c.criticalClient
 	call.err = err

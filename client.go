@@ -20,7 +20,7 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-type Client struct {
+type client struct {
 	debugClient    *httpClient
 	infoClient     *httpClient
 	errorClient    *httpClient
@@ -53,29 +53,29 @@ var defaultHTTPClient = httpClient{
 //
 // The `token` is required, other optional parameters can be passed using the
 // various `With...` functions.
-func New(token string, options ...Option) Rollbar {
-	client := defaultHTTPClient
-	client.token = token
+func New(token string, options ...Option) Client {
+	cl := defaultHTTPClient
+	cl.token = token
 	if debug, err := strconv.ParseBool(os.Getenv("ROLLBAR_DEBUG")); err == nil && debug {
-		client.debug = debug
+		cl.debug = debug
 	}
 
 	for _, o := range options {
-		o(&client)
+		o(&cl)
 	}
-	if _, ok := client.logger.(nilLogger); client.debug && ok {
-		client.logger = traceLogger{os.Stderr}
+	if _, ok := cl.logger.(nilLogger); cl.debug && ok {
+		cl.logger = traceLogger{os.Stderr}
 	}
-	if client.serverHost == "" {
-		client.serverHost, _ = os.Hostname()
+	if cl.serverHost == "" {
+		cl.serverHost, _ = os.Hostname()
 	}
 
-	return &Client{
-		debugClient:    &client,
-		infoClient:     &client,
-		errorClient:    &client,
-		warnClient:     &client,
-		criticalClient: &client,
+	return &client{
+		debugClient:    &cl,
+		infoClient:     &cl,
+		errorClient:    &cl,
+		warnClient:     &cl,
+		criticalClient: &cl,
 	}
 }
 
