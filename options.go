@@ -101,3 +101,10 @@ func WithServerRoot(root string) Option {
 		c.serverRoot = root
 	}
 }
+
+// WithServerBranch name of the checked-out source control branch. Defaults to "master".
+func WithServerBranch(branch string) Option {
+	return func(c *httpClient) {
+		c.serverBranch = branch
+	}
+}

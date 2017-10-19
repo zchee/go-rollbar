@@ -29,16 +29,17 @@ type client struct {
 }
 
 type httpClient struct {
-	token       string
-	client      *http.Client
-	endpoint    string
-	debug       bool
-	logger      Logger
-	environment string
-	platform    string
-	codeVersion string
-	serverHost  string
-	serverRoot  string
+	token        string
+	client       *http.Client
+	endpoint     string
+	debug        bool
+	logger       Logger
+	environment  string
+	platform     string
+	codeVersion  string
+	serverHost   string
+	serverRoot   string
+	serverBranch string
 }
 
 var defaultHTTPClient = httpClient{
@@ -95,8 +96,9 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 		Platform:    c.platform,
 		Language:    language,
 		Server: &api.Server{
-			Host: c.serverHost,
-			Root: c.serverRoot,
+			Host:   c.serverHost,
+			Root:   c.serverRoot,
+			Branch: c.serverBranch,
 		},
 		Fingerprint: stack.Fingerprint(),
 		Title:       title,
