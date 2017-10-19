@@ -7,7 +7,11 @@ package rollbar
 import (
 	"fmt"
 	"hash/adler32"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"reflect"
+	"regexp"
 	"strings"
 
 	api "github.com/zchee/go-rollbar/api/v1"
@@ -47,6 +51,41 @@ func errorClass(err error) string {
 	default:
 		return strings.TrimPrefix(fn, "*")
 	}
+}
+
+var (
+	// TODO(zchee): remove it
+	reFilterHeaders = regexp.MustCompile("Authorization")
+	reFilterFields  = regexp.MustCompile("password|secret|token")
+)
+
+func errorRequest(req *http.Request) *api.Request {
+	const remoteIP = "$remote_ip"
+
+	query := filterParams(reFilterFields, req.URL.Query())
+	body, _ := ioutil.ReadAll(req.Body)
+
+	return &api.Request{
+		URL:         req.URL.String(),
+		Method:      req.Method,
+		Headers:     filterParams(reFilterHeaders, req.Header),
+		GET:         query,
+		QueryString: url.Values(query).Encode(),
+		POST:        req.Form,
+		Body:        string(body),
+		UserIP:      remoteIP,
+	}
+}
+
+func filterParams(pat *regexp.Regexp, values map[string][]string) map[string][]string {
+	const redacted = "xxxxxxxxxxxx (redacted)"
+	for key, _ := range values {
+		if pat.MatchString(key) {
+			values[key] = []string{redacted}
+		}
+	}
+
+	return values
 }
 
 // Level level of stack trace.

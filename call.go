@@ -5,11 +5,14 @@
 package rollbar
 
 import (
+	"net/http"
+
 	api "github.com/zchee/go-rollbar/api/v1"
 	"golang.org/x/net/context"
 )
 
 type Call interface {
+	Request(*http.Request) Call
 	Custom(map[string]interface{}) Call
 	UUID(string) Call
 	Do(context.Context) (*api.Response, error)
@@ -17,11 +20,15 @@ type Call interface {
 
 type callOption struct {
 	err    error
+	req    *http.Request
 	custom map[string]interface{}
 	id     string
 }
 
 func joinPayload(payload *api.Payload, opt callOption) {
+	if opt.req != nil {
+		payload.Data.Request = errorRequest(opt.req)
+	}
 	if opt.custom != nil {
 		payload.Data.Custom = opt.custom
 	}
@@ -41,6 +48,12 @@ func (c *client) Debug(err error) Call {
 	call.client = c.debugClient
 	call.err = err
 	return &call
+}
+
+// Request is a data about the request this event occurred in.
+func (c *DebugCall) Request(req *http.Request) Call {
+	c.req = req
+	return c
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -80,6 +93,12 @@ func (c *client) Info(err error) Call {
 	return &call
 }
 
+// Request is a data about the request this event occurred in.
+func (c *InfoCall) Request(req *http.Request) Call {
+	c.req = req
+	return c
+}
+
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *InfoCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
@@ -115,6 +134,12 @@ func (c *client) Error(err error) Call {
 	call.client = c.errorClient
 	call.err = err
 	return &call
+}
+
+// Request is a data about the request this event occurred in.
+func (c *ErrorCall) Request(req *http.Request) Call {
+	c.req = req
+	return c
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
@@ -154,6 +179,12 @@ func (c *client) Warn(err error) Call {
 	return &call
 }
 
+// Request is a data about the request this event occurred in.
+func (c *WarnCall) Request(req *http.Request) Call {
+	c.req = req
+	return c
+}
+
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
 func (c *WarnCall) Custom(custom map[string]interface{}) Call {
 	c.custom = custom
@@ -189,6 +220,12 @@ func (c *client) Critical(err error) Call {
 	call.client = c.criticalClient
 	call.err = err
 	return &call
+}
+
+// Request is a data about the request this event occurred in.
+func (c *CriticalCall) Request(req *http.Request) Call {
+	c.req = req
+	return c
 }
 
 // Custom is any arbitrary metadata you want to send. "custom" itself should be an object.
