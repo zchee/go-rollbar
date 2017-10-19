@@ -131,7 +131,7 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) (*api.Resp
 
 	req, err := http.NewRequest(http.MethodPost, c.endpoint, bytes.NewReader(data))
 	if err != nil {
-		return nil, errors.New("failed to create new POST request")
+		return nil, errors.Wrap(err, "failed to create new POST request")
 	}
 
 	ctx, cancel := context.WithCancel(pctx)
