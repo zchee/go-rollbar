@@ -79,7 +79,7 @@ func errorRequest(req *http.Request) *api.Request {
 
 func filterParams(pat *regexp.Regexp, values map[string][]string) map[string][]string {
 	const redacted = "xxxxxxxxxxxx (redacted)"
-	for key, _ := range values {
+	for key := range values {
 		if pat.MatchString(key) {
 			values[key] = []string{redacted}
 		}
