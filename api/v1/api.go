@@ -5,6 +5,7 @@
 package rollbar_v1
 
 const (
+	// DefaultEndpoint default of Rollbar v1 API endpoint.
 	DefaultEndpoint = "https://api.rollbar.com/api/1/item/"
 )
 
