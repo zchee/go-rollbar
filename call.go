@@ -11,6 +11,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Call respesents a fluent style call options.
 type Call interface {
 	Request(*http.Request) Call
 	Person(string, string, string) Call
@@ -42,6 +43,7 @@ func joinPayload(payload *api.Payload, opt callOption) {
 	}
 }
 
+// DebugCall represents a calls the debug level stack trace.
 type DebugCall struct {
 	client *httpClient
 	callOption
@@ -102,6 +104,7 @@ func (c *DebugCall) Do(ctx context.Context) (*api.Response, error) {
 	return c.client.post(ctx, payload)
 }
 
+// InfoCall represents a calls the info level stack trace.
 type InfoCall struct {
 	client *httpClient
 	callOption
@@ -162,6 +165,7 @@ func (c *InfoCall) Do(ctx context.Context) (*api.Response, error) {
 	return c.client.post(ctx, payload)
 }
 
+// ErrorCall represents a calls the error level stack trace.
 type ErrorCall struct {
 	client *httpClient
 	callOption
@@ -222,6 +226,7 @@ func (c *ErrorCall) Do(ctx context.Context) (*api.Response, error) {
 	return c.client.post(ctx, payload)
 }
 
+// WarnCall represents a calls the warning level stack trace.
 type WarnCall struct {
 	client *httpClient
 	callOption
@@ -282,6 +287,7 @@ func (c *WarnCall) Do(ctx context.Context) (*api.Response, error) {
 	return c.client.post(ctx, payload)
 }
 
+// CriticalCall represents a calls the critical level stack trace.
 type CriticalCall struct {
 	client *httpClient
 	callOption

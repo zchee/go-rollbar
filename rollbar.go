@@ -5,12 +5,15 @@
 package rollbar
 
 const (
-	Name    = "go-rollbar"
+	// Name name of client package.
+	Name = "go-rollbar"
+	// Version version of client package.
 	Version = "0.0.0"
 
 	language = "go"
 )
 
+// Client represents a first Client methods.
 type Client interface {
 	Debug(error) Call
 	Info(error) Call

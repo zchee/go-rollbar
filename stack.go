@@ -14,8 +14,10 @@ import (
 	api "github.com/zchee/go-rollbar/api/v1"
 )
 
+// Stack represents a api.Frame slice.
 type Stack []*api.Frame
 
+// CreateStack creates the Stack data except before skip callers.
 func CreateStack(skip int) Stack {
 	var stack Stack
 
@@ -34,6 +36,7 @@ func CreateStack(skip int) Stack {
 	return stack
 }
 
+// CreateStackFromCaller creates the Stack data from callers.
 func CreateStackFromCaller(callers []uintptr) Stack {
 	stack := make(Stack, 0, len(callers))
 
@@ -51,6 +54,10 @@ func CreateStackFromCaller(callers []uintptr) Stack {
 	return stack
 }
 
+// Fingerprint create a fingerprint that uniqely identify a given message.
+// We use the full callstack, including file names. That ensure that there are no false duplicates
+// but also means that after changing the code (adding/removing lines), the fingerprints will change.
+// It's a trade-off.
 func (s Stack) Fingerprint() string {
 	h := crc32.NewIEEE()
 	for _, frame := range s {
