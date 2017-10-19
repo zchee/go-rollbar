@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
@@ -142,7 +143,10 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) (*api.Resp
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to POST to rollbar")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.Errorf("received response: %s", resp.Status)
