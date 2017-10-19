@@ -152,24 +152,27 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) (*api.Resp
 		return nil, errors.Errorf("received response: %s", resp.Status)
 	}
 
-	return c.parseResponse(ctx, resp.Body), nil
+	return c.parseResponse(ctx, resp.Body)
 }
 
 // parseResponse parses the rollbar API response.
-func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader) *api.Response {
-	buf := new(bytes.Buffer)
-	io.Copy(buf, rdr)
+func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader) (*api.Response, error) {
+	body, err := ioutil.ReadAll(rdr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read body")
+	}
 
-	c.logger.Debugf(ctx, "-----> %s (response)\n", c.endpoint)
 	m := new(api.Response)
-	if err := json.Unmarshal(buf.Bytes(), m); err != nil {
-		c.logger.Debugf(ctx, "failed to unmarshal payload: %s\n", err)
-		c.logger.Debugf(ctx, "%s\n", buf.String())
-	} else {
+	if err := json.Unmarshal(body, m); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal payload")
+	}
+
+	if c.debug {
+		c.logger.Debugf(ctx, "-----> %s (response)\n", c.endpoint)
 		formatted, _ := json.MarshalIndent(m, "", "  ")
 		c.logger.Debugf(ctx, "%s\n", formatted)
+		c.logger.Debugf(ctx, "<----- %s (response)\n", c.endpoint)
 	}
-	c.logger.Debugf(ctx, "<----- %s (response)\n", c.endpoint)
 
-	return m
+	return m, nil
 }
