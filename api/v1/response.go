@@ -4,12 +4,14 @@
 
 package rollbar_v1
 
+// Response represents a rollbar REST API response.
 type Response struct {
 	Err     int    `json:"err"`
 	Result  Result `json:"result,omitempty"`
 	Message string `json:"message,omitempty"`
 }
 
+// Result result of response data.
 type Result struct {
 	UUID string `json:"uuid"`
 }
