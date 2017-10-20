@@ -37,7 +37,7 @@ go-rollbar is released under the [BSD 3-Clause License](LICENSE).
 
 <!-- badge -->
 
-[circleci]: https://circleci.com/gh/zchee/go-rollbar
+[circleci]: https://circleci.com/gh/zchee/workflows/go-rollbar
 [codecov]: https://codecov.io/gh/zchee/go-rollbar
 [godoc]: https://godoc.org/github.com/zchee/go-rollbar
 [release]: https://github.com/zchee/go-rollbar/releases
