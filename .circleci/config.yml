@@ -1,0 +1,51 @@
+version: 2
+
+defaults: &defaults
+  working_directory: /go/src/github.com/zchee/go-rollbar
+  steps:
+    - checkout
+    - run:
+        name: Install build dependencies
+        command: |
+          go get -v -t .
+          go get -u \
+            github.com/golang/lint/golint \
+            honnef.co/go/tools/cmd/staticcheck
+    - run:
+        name: golint
+        command: |
+          golint -set_exit_status -min_confidence=0.3
+    - run:
+        name: go vet
+        command: |
+          go vet
+    - run:
+        name: staticcheck
+        command: |
+          staticcheck
+    - run:
+        name: test
+        command: |
+          go test -v -race -cover -covermode=atomic -coverprofile=coverage.txt .
+    - run:
+        name: codecov
+        command: |
+          bash <(curl -s https://codecov.io/bash) -t $(CODECOV_TOKEN)
+
+jobs:
+  go1.8:
+    <<: *defaults
+    docker:
+      - image: golang:1.8
+
+  go1.9:
+    <<: *defaults
+    docker:
+      - image: golang:1.9
+
+workflows:
+  version: 2
+  build-and-testing:
+    jobs:
+      - go1.8
+      - go1.9
