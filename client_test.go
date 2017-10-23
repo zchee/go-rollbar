@@ -5,6 +5,7 @@
 package rollbar
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -246,6 +247,87 @@ func TestNew(t *testing.T) {
 			got := New(tt.args.token, tt.args.options...)
 			if !reflect.DeepEqual(got, want) {
 				t.Errorf("%q. New(%v, %v) = %v, want %v", tt.name, tt.args.token, tt.args.options, got, want)
+			}
+		})
+	}
+}
+
+func Test_httpClient_payload(t *testing.T) {
+	const testToken = "xxxxxxxxxxxxxxxx"
+	hostName, err := os.Hostname()
+	if err != nil {
+		t.Errorf("failed get the OS hostname: %v", err)
+	}
+	now := time.Now().Unix()
+
+	type fields struct {
+		token        string
+		environment  string
+		platform     string
+		codeVersion  string
+		serverHost   string
+		serverRoot   string
+		serverBranch string
+	}
+	type args struct {
+		level Level
+		err   error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *api.Payload
+	}{
+		{
+			name: "default",
+			fields: fields{
+				token:       testToken,
+				environment: "development",
+				platform:    runtime.GOOS,
+				serverHost:  hostName,
+			},
+			args: args{
+				level: DebugLevel,
+				err:   errors.New("default error"),
+			},
+			want: &api.Payload{
+				AccessToken: testToken,
+				Data: &api.Data{
+					Environment: "development",
+					Body: &api.Body{
+						Trace: testTrace,
+					},
+					Level:     "debug",
+					Timestamp: now,
+					Platform:  runtime.GOOS,
+					Language:  language,
+					Server: &api.Server{
+						Host: hostName,
+					},
+					Fingerprint: testFingerprint,
+					Title:       "default error",
+					Notifier: &api.Notifier{
+						Name:    "go-rollbar",
+						Version: "0.0.0",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &httpClient{
+				token:        tt.fields.token,
+				environment:  tt.fields.environment,
+				platform:     tt.fields.platform,
+				codeVersion:  tt.fields.codeVersion,
+				serverHost:   tt.fields.serverHost,
+				serverRoot:   tt.fields.serverRoot,
+				serverBranch: tt.fields.serverBranch,
+			}
+			if got := c.payload(tt.args.level, tt.args.err); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("httpClient.payload(%v, %v) = %v, want %v", tt.args.level, tt.args.err, got, tt.want)
 			}
 		})
 	}
