@@ -2,7 +2,7 @@
 
 [![CircleCI][circleci-badge]][circleci] [![codecov.io][codecov-badge]][codecov] [![godoc.org][godoc-badge]][godoc] [![Releases][release-badge]][release] [![GA][ga-badge]][ga]
 
-Go client for [Rollbar.com](https://rollbar.com)
+Go client for [Rollbar.com](https://rollbar.com).
 
 
 ## Requirements
@@ -11,7 +11,7 @@ Go client for [Rollbar.com](https://rollbar.com)
 
 
 ## Usage
-TODO(zchee): write Usage
+TODO(zchee): write Usage.
 
 
 ## Install
