@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -253,6 +254,9 @@ func TestNew(t *testing.T) {
 }
 
 func Test_httpClient_payload(t *testing.T) {
+	if strings.HasPrefix(runtime.Version(), "devel") {
+		t.Skip("go version is devel")
+	}
 	const testToken = "xxxxxxxxxxxxxxxx"
 	hostName, err := os.Hostname()
 	if err != nil {
