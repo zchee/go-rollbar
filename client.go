@@ -115,8 +115,8 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 	}
 }
 
-// post posts payload to rollbar.
-func (c *httpClient) post(pctx context.Context, payload *api.Payload) (*api.Response, error) {
+// newRequest creates new http.Request from payload.
+func (c *httpClient) newRequest(payload *api.Payload) (*http.Request, error) {
 	if c.token == "" {
 		return nil, errors.New("empty token")
 	}
@@ -125,54 +125,60 @@ func (c *httpClient) post(pctx context.Context, payload *api.Payload) (*api.Resp
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to encode payload")
 	}
-	if c.debug {
-		out, _ := json.MarshalIndent(payload, "", "  ")
-		c.logger.Debugf(pctx, string(out)+"\n")
-	}
 
 	req, err := http.NewRequest(http.MethodPost, c.endpoint, bytes.NewReader(data))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create new POST request")
 	}
 
-	ctx, cancel := context.WithCancel(pctx)
-	defer cancel()
-
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", UserAgent)
+
+	return req, nil
+}
+
+// Do posts payload to rollbar.
+// The returns rollbar response into res.
+func (c *httpClient) Do(ctx context.Context, req *http.Request, res *api.Response) error {
 	resp, err := ctxhttp.Do(ctx, c.client, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to POST to rollbar")
+		select {
+		default:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		return errors.Wrap(err, "failed to POST to rollbar")
 	}
+
 	defer func() {
 		io.Copy(ioutil.Discard, resp.Body)
 		resp.Body.Close()
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("received response: %s", resp.Status)
+		return errors.Errorf("received response: %s", resp.Status)
 	}
 
-	return c.parseResponse(ctx, resp.Body)
+	return c.parseResponse(ctx, resp.Body, res)
 }
 
 // parseResponse parses the rollbar API response.
-func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader) (*api.Response, error) {
-	body, err := ioutil.ReadAll(rdr)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read body")
-	}
-
-	m := new(api.Response)
-	if err := json.Unmarshal(body, m); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal payload")
-	}
-
+func (c *httpClient) parseResponse(ctx context.Context, rdr io.Reader, resp *api.Response) error {
 	if c.debug {
+		buf := new(bytes.Buffer)
+		io.Copy(buf, rdr)
+
 		c.logger.Debugf(ctx, "-----> %s (response)\n", c.endpoint)
-		formatted, _ := json.MarshalIndent(m, "", "  ")
-		c.logger.Debugf(ctx, "%s\n", formatted)
+		var m map[string]interface{}
+		if err := json.Unmarshal(buf.Bytes(), &m); err != nil {
+			c.logger.Debugf(ctx, "failed to unmarshal payload: %v", err)
+		} else {
+			formatted, _ := json.MarshalIndent(m, "", "  ")
+			c.logger.Debugf(ctx, "%s\n", formatted)
+		}
 		c.logger.Debugf(ctx, "<----- %s (response)\n", c.endpoint)
+		rdr = buf
 	}
 
-	return m, nil
+	return json.NewDecoder(rdr).Decode(resp)
 }

@@ -101,7 +101,13 @@ func (c *DebugCall) UUID(id string) Call {
 func (c *DebugCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(DebugLevel, c.err)
 	joinPayload(payload, c.callOption)
-	return c.client.post(ctx, payload)
+	req, err := c.client.newRequest(payload)
+	if err != nil {
+		return nil, err
+	}
+	var m api.Response
+	err = c.client.Do(ctx, req, &m)
+	return &m, err
 }
 
 // InfoCall represents a calls the info level stack trace.
@@ -162,7 +168,13 @@ func (c *InfoCall) UUID(id string) Call {
 func (c *InfoCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(InfoLevel, c.err)
 	joinPayload(payload, c.callOption)
-	return c.client.post(ctx, payload)
+	req, err := c.client.newRequest(payload)
+	if err != nil {
+		return nil, err
+	}
+	var m api.Response
+	err = c.client.Do(ctx, req, &m)
+	return &m, err
 }
 
 // ErrorCall represents a calls the error level stack trace.
@@ -223,7 +235,13 @@ func (c *ErrorCall) UUID(id string) Call {
 func (c *ErrorCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(ErrorLevel, c.err)
 	joinPayload(payload, c.callOption)
-	return c.client.post(ctx, payload)
+	req, err := c.client.newRequest(payload)
+	if err != nil {
+		return nil, err
+	}
+	var m api.Response
+	err = c.client.Do(ctx, req, &m)
+	return &m, err
 }
 
 // WarnCall represents a calls the warning level stack trace.
@@ -284,7 +302,13 @@ func (c *WarnCall) UUID(id string) Call {
 func (c *WarnCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(WarnLevel, c.err)
 	joinPayload(payload, c.callOption)
-	return c.client.post(ctx, payload)
+	req, err := c.client.newRequest(payload)
+	if err != nil {
+		return nil, err
+	}
+	var m api.Response
+	err = c.client.Do(ctx, req, &m)
+	return &m, err
 }
 
 // CriticalCall represents a calls the critical level stack trace.
@@ -345,5 +369,11 @@ func (c *CriticalCall) UUID(id string) Call {
 func (c *CriticalCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(CriticalLevel, c.err)
 	joinPayload(payload, c.callOption)
-	return c.client.post(ctx, payload)
+	req, err := c.client.newRequest(payload)
+	if err != nil {
+		return nil, err
+	}
+	var m api.Response
+	err = c.client.Do(ctx, req, &m)
+	return &m, err
 }
