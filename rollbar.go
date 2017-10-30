@@ -10,6 +10,8 @@ const (
 	// Version version of client package.
 	Version = "0.0.0"
 
+	UserAgent = "go-rollbar/" + Version
+
 	language = "go"
 )
 
