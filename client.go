@@ -95,6 +95,7 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 		Level:       string(level),
 		Timestamp:   time.Now().Unix(),
 		Platform:    c.platform,
+		CodeVersion: c.codeVersion,
 		Language:    language,
 		Server: &api.Server{
 			Host:   c.serverHost,
