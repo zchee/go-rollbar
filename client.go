@@ -21,6 +21,15 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
+// Client represents a first Client methods.
+type Client interface {
+	Debug(error) Call
+	Info(error) Call
+	Error(error) Call
+	Warn(error) Call
+	Critical(error) Call
+}
+
 type client struct {
 	debugClient    *httpClient
 	infoClient     *httpClient

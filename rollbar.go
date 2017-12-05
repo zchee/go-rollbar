@@ -15,12 +15,3 @@ const (
 
 	language = "go"
 )
-
-// Client represents a first Client methods.
-type Client interface {
-	Debug(error) Call
-	Info(error) Call
-	Error(error) Call
-	Warn(error) Call
-	Critical(error) Call
-}
