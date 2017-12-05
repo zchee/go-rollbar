@@ -75,6 +75,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -91,6 +92,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -107,6 +109,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -123,6 +126,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -140,6 +144,7 @@ func TestNew(t *testing.T) {
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
 				debug:       true,
+				stackskip:   3,
 			},
 		},
 		{
@@ -156,6 +161,7 @@ func TestNew(t *testing.T) {
 				environment: "production",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -172,6 +178,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    "google-app-engine",
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 		{
@@ -189,6 +196,7 @@ func TestNew(t *testing.T) {
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
 				codeVersion: "2.1.12",
+				stackskip:   3,
 			},
 		},
 		{
@@ -205,6 +213,7 @@ func TestNew(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  "localhost",
+				stackskip:   3,
 			},
 		},
 		{
@@ -222,6 +231,7 @@ func TestNew(t *testing.T) {
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
 				serverRoot:  "/app/src",
+				stackskip:   3,
 			},
 		},
 		{
@@ -239,6 +249,24 @@ func TestNew(t *testing.T) {
 				platform:     runtime.GOOS,
 				serverHost:   hostName,
 				serverBranch: "test-branch",
+				stackskip:    3,
+			},
+		},
+		{
+			name: "with WithStackSkip",
+			args: args{
+				token:   testToken,
+				options: []Option{WithStackSkip(3)},
+			},
+			wantClient: httpClient{
+				token:       testToken,
+				client:      http.DefaultClient,
+				endpoint:    api.DefaultEndpoint,
+				logger:      nilLogger{},
+				environment: "development",
+				platform:    runtime.GOOS,
+				serverHost:  hostName,
+				stackskip:   3,
 			},
 		},
 	}
@@ -272,6 +300,7 @@ func Test_httpClient_payload(t *testing.T) {
 		serverHost   string
 		serverRoot   string
 		serverBranch string
+		stackskip    int
 	}
 	type args struct {
 		level Level
@@ -290,6 +319,7 @@ func Test_httpClient_payload(t *testing.T) {
 				environment: "development",
 				platform:    runtime.GOOS,
 				serverHost:  hostName,
+				stackskip:   3,
 			},
 			args: args{
 				level: DebugLevel,
@@ -329,6 +359,7 @@ func Test_httpClient_payload(t *testing.T) {
 				serverHost:   tt.fields.serverHost,
 				serverRoot:   tt.fields.serverRoot,
 				serverBranch: tt.fields.serverBranch,
+				stackskip:    tt.fields.stackskip,
 			}
 			if got := c.payload(tt.args.level, tt.args.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("httpClient.payload(%v, %v) = %v, want %v", tt.args.level, tt.args.err, got, tt.want)
