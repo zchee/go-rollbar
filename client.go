@@ -41,6 +41,7 @@ type httpClient struct {
 	serverHost   string
 	serverRoot   string
 	serverBranch string
+	stackskip    int
 }
 
 var defaultHTTPClient = httpClient{
@@ -49,6 +50,7 @@ var defaultHTTPClient = httpClient{
 	logger:      nilLogger{},
 	environment: "development",
 	platform:    runtime.GOOS,
+	stackskip:   3, // default is 3
 }
 
 // New creates a new REST rollbar API client.
@@ -87,7 +89,7 @@ func (c *httpClient) payload(level Level, err error) *api.Payload {
 	if err != nil {
 		title = err.Error()
 	}
-	stack := CreateStack(3)
+	stack := CreateStack(c.stackskip)
 
 	data := &api.Data{
 		Environment: c.environment,

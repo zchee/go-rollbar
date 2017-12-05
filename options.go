@@ -108,3 +108,10 @@ func WithServerBranch(branch string) Option {
 		c.serverBranch = branch
 	}
 }
+
+// WithStackSkip number of skip error stacks.
+func WithStackSkip(skip int) Option {
+	return func(c *httpClient) {
+		c.stackskip = skip
+	}
+}
