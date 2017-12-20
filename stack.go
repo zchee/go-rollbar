@@ -72,7 +72,7 @@ func funcNameFromFunc(fn *runtime.Func) string {
 	}
 	name := fn.Name()
 	end := strings.LastIndex(name, string(filepath.Separator))
-	return name[end+1 : len(name)]
+	return name[end+1:]
 }
 
 func funcName(pc uintptr) string {

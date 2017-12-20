@@ -15,12 +15,12 @@ import (
 var (
 	testTrace = &api.Trace{
 		Frames: []*api.Frame{
-			&api.Frame{
+			{
 				Filename: "/usr/local/go/src/testing/testing.go",
 				Lineno:   746,
 				Method:   "testing.tRunner",
 			},
-			&api.Frame{
+			{
 				Filename: "/usr/local/go/src/runtime/asm_amd64.s",
 				Lineno:   2337,
 				Method:   "runtime.goexit",
