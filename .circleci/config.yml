@@ -18,15 +18,15 @@ defaults: &defaults
     - run:
         name: golint
         command: |
-          golint -set_exit_status -min_confidence=0.3
+          golint -set_exit_status -min_confidence=0.3 . ./api/v1
     - run:
         name: go vet
         command: |
-          go vet
+          go vet -all -shadow . ./api/v1
     - run:
         name: staticcheck
         command: |
-          staticcheck
+          staticcheck . ./api/v1
     - run:
         name: test
         command: |
