@@ -17,6 +17,7 @@ type Call interface {
 	Person(string, string, string) Call
 	Custom(map[string]interface{}) Call
 	UUID(string) Call
+	Title(string) Call
 	Do(context.Context) (*api.Response, error)
 }
 
@@ -26,6 +27,7 @@ type callOption struct {
 	person *api.Person
 	custom map[string]interface{}
 	id     string
+	title  string
 }
 
 func joinPayload(payload *api.Payload, opt callOption) {
@@ -40,6 +42,9 @@ func joinPayload(payload *api.Payload, opt callOption) {
 	}
 	if opt.id != "" {
 		payload.Data.UUID = opt.id
+	}
+	if opt.title != "" {
+		payload.Data.Title = opt.title
 	}
 }
 
@@ -94,6 +99,15 @@ func (c *DebugCall) Custom(custom map[string]interface{}) Call {
 // While optional, it is recommended that all clients generate and provide this field.
 func (c *DebugCall) UUID(id string) Call {
 	c.id = id
+	return c
+}
+
+// Title is an optional text description that is displayed when viewing an item.
+// It must be a string, of length 1-255 characters.
+// You can change the title in this configuration without impacting the fingerprint.
+// The new title will take effect if the item is reactivated after being resolved.
+func (c *DebugCall) Title(title string) Call {
+	c.title = title
 	return c
 }
 
@@ -164,6 +178,15 @@ func (c *InfoCall) UUID(id string) Call {
 	return c
 }
 
+// Title is an optional text description that is displayed when viewing an item.
+// It must be a string, of length 1-255 characters.
+// You can change the title in this configuration without impacting the fingerprint.
+// The new title will take effect if the item is reactivated after being resolved.
+func (c *InfoCall) Title(title string) Call {
+	c.title = title
+	return c
+}
+
 // Do executes the call to access rollbar endpoint.
 func (c *InfoCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(InfoLevel, c.err)
@@ -228,6 +251,15 @@ func (c *ErrorCall) Custom(custom map[string]interface{}) Call {
 // While optional, it is recommended that all clients generate and provide this field.
 func (c *ErrorCall) UUID(id string) Call {
 	c.id = id
+	return c
+}
+
+// Title is an optional text description that is displayed when viewing an item.
+// It must be a string, of length 1-255 characters.
+// You can change the title in this configuration without impacting the fingerprint.
+// The new title will take effect if the item is reactivated after being resolved.
+func (c *ErrorCall) Title(title string) Call {
+	c.title = title
 	return c
 }
 
@@ -298,6 +330,15 @@ func (c *WarnCall) UUID(id string) Call {
 	return c
 }
 
+// Title is an optional text description that is displayed when viewing an item.
+// It must be a string, of length 1-255 characters.
+// You can change the title in this configuration without impacting the fingerprint.
+// The new title will take effect if the item is reactivated after being resolved.
+func (c *WarnCall) Title(title string) Call {
+	c.title = title
+	return c
+}
+
 // Do executes the call to access rollbar endpoint.
 func (c *WarnCall) Do(ctx context.Context) (*api.Response, error) {
 	payload := c.client.payload(WarnLevel, c.err)
@@ -362,6 +403,15 @@ func (c *CriticalCall) Custom(custom map[string]interface{}) Call {
 // While optional, it is recommended that all clients generate and provide this field.
 func (c *CriticalCall) UUID(id string) Call {
 	c.id = id
+	return c
+}
+
+// Title is an optional text description that is displayed when viewing an item.
+// It must be a string, of length 1-255 characters.
+// You can change the title in this configuration without impacting the fingerprint.
+// The new title will take effect if the item is reactivated after being resolved.
+func (c *CriticalCall) Title(title string) Call {
+	c.title = title
 	return c
 }
 
