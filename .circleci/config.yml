@@ -7,10 +7,14 @@ defaults: &defaults
     - run:
         name: Install build dependencies
         command: |
-          go get -v -t .
           go get -u \
+            github.com/golang/dep/cmd/dep \
             github.com/golang/lint/golint \
             honnef.co/go/tools/cmd/staticcheck
+    - run:
+        name: Install vendor packages
+        command: |
+          dep ensure -v
     - run:
         name: golint
         command: |
